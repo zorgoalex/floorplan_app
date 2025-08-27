@@ -17,32 +17,22 @@ export function metersNumber(v: string, min = 0): number | null {
 }
 
 export function buildField() {
-  // Общая ширина поля = нижний ряд (6 блоков)
+  // Одинаковые ряды: 6 блоков в верхнем и нижнем рядах, выровнены по левому краю
   const width = FIELD.bottomRow * FIELD.blockW;   // 6 * 6 = 36 м
   const height = 2 * FIELD.blockH;                // 2 * 16 = 32 м
-  const blocks: { id: string; x: number; y: number; w: number; h: number; special?: boolean }[] = [];
-  
-  // Верхний ряд: 5 блоков + 1 специальный (сдвиг на 1 блок вправо)
+  const blocks: { id: string; x: number; y: number; w: number; h: number }[] = [];
+
+  // Верхний ряд: 6 блоков, начиная с x=0
   for (let i = 0; i < FIELD.topRow; i++) {
     blocks.push({
       id: `T${i}`,
-      x: (i + 1) * FIELD.blockW, // сдвиг на 1 блок вправо
+      x: i * FIELD.blockW,
       y: 0,
       w: FIELD.blockW,
       h: FIELD.blockH
     });
   }
-  
-  // Специальный 6-й блок в верхнем ряду (имитация отсутствия)
-  blocks.push({
-    id: 'T_special',
-    x: 0,
-    y: 0,
-    w: FIELD.blockW,
-    h: FIELD.blockH,
-    special: true // маркер для специального оформления
-  });
-  
+
   // Нижний ряд: 6 блоков, начиная с x=0
   for (let i = 0; i < FIELD.bottomRow; i++) {
     blocks.push({
@@ -53,7 +43,7 @@ export function buildField() {
       h: FIELD.blockH
     });
   }
-  
+
   return { width, height, blocks };
 }
 
@@ -80,29 +70,12 @@ export function columnsBuilder(field = buildField()) {
   return (scale: number) => {
     const items: { id: string; cx: number; cy: number; r: number }[] = [];
     const r = metersToPx(COLUMN_DIAM / 2, scale);
-    
-    // Столбы только между верхним и нижним рядом прямоугольников
-    // Размещаются на границе между рядами (y = FIELD.blockH) там, где пересекаются блоки
-    
-    // Верхний ряд: блоки от x=0 до x=36 (6 блоков по 6м)
-    // Нижний ряд: блоки от x=6 до x=36 (5 блоков по 6м, сдвиг на 6м)
-    // Пересечение: от x=6 до x=36
-    
-    // Новая конфигурация: 
-    // Верхний ряд: 5 блоков от x=6 до x=36
-    // Нижний ряд: 6 блоков от x=0 до x=36
-    // Пересечение: от x=6 до x=36
-    
-    // Столбы на стыках между блоками в зоне пересечения
-    for (let x = 12; x <= 30; x += 6) { // x=12,18,24,30 (4 столба)
-      items.push({
-        id: `column_${x}`,
-        cx: metersToPx(x, scale),
-        cy: metersToPx(FIELD.blockH, scale), // на границе между рядами
-        r
-      });
+
+    // При 6×6 блоках столбы на границе между рядами (y = FIELD.blockH)
+    // в местах вертикальных швов: x = 6,12,18,24,30 (5 столбов)
+    for (let x = FIELD.blockW; x <= (FIELD.bottomRow - 1) * FIELD.blockW; x += FIELD.blockW) {
+      items.push({ id: `column_${x}`, cx: metersToPx(x, scale), cy: metersToPx(FIELD.blockH, scale), r });
     }
-    
     return items;
   };
 }
@@ -112,13 +85,18 @@ export const gridLines = gridLinesBuilder(field);
 export const columns = columnsBuilder(field);
 
 // Обновленная функция для проверки попадания в зону удаления в сайдбаре
-export function withinDeleteZone(pxX: number, pxY: number, container: DOMRect) {
-  // Правая колонка сайдбара: ширина 320px + padding 16px
-  const sidebarStart = container.right - 320 - 16;
-  const sidebarEnd = container.right - 16;
-  
-  // Примерная область зоны удаления внизу сайдбара
-  const deleteZoneTop = container.bottom - 600; // Увеличено в 3 раза: 600px от низа
-  
-  return pxX >= sidebarStart && pxX <= sidebarEnd && pxY >= deleteZoneTop;
+export function withinDeleteZone(pxX: number, pxY: number, _container: DOMRect) {
+  // Привязка к реальному DOM-элементу зоны удаления в сайдбаре
+  const el = typeof document !== 'undefined' ? document.getElementById('delete-zone') : null;
+  if (el) {
+    const r = el.getBoundingClientRect();
+    return pxX >= r.left && pxX <= r.right && pxY >= r.top && pxY <= r.bottom;
+  }
+  // Fallback: нижняя правая область окна на ширину 240px и высоту 900px
+  const vw = typeof window !== 'undefined' ? window.innerWidth : 0;
+  const vh = typeof window !== 'undefined' ? window.innerHeight : 0;
+  const left = vw - 240;
+  const right = vw;
+  const top = Math.max(0, vh - 900); // увеличить высоту в 3 раза
+  return pxX >= left && pxX <= right && pxY >= top;
 }

@@ -53,7 +53,10 @@ export const useStore = create<Store>((set, get) => ({
   gridLines: baseGridLines,
   columns: baseColumns,
 
-  figures: [],
+  figures: [
+    // Постоянная белая фигура: закрывает верхний правый прямоугольник (6м×16м)
+    { id: "__fixed_cover__", type: "figure", name: undefined, color: "#ffffff", x: 30, y: 0, w: 6, h: 16, z: 1, locked: true }
+  ],
   lines: [],
   groups: [],
   selectedId: null,
@@ -85,6 +88,8 @@ export const useStore = create<Store>((set, get) => ({
 
   deleteSelected: () => set((st)=>{
     const id = st.selectedId; if(!id) return {} as any;
+    const f = st.figures.find(x=>x.id===id);
+    if (f?.locked) return {} as any;
     return {
       figures: st.figures.filter(f=>f.id!==id),
       lines: st.lines.filter(l=>l.id!==id),
@@ -113,6 +118,7 @@ export const useStore = create<Store>((set, get) => ({
     const id = st.selectedId; if(!id) return {} as any;
     const f = st.figures.find(x=>x.id===id);
     if (!f) return {} as any;
+    if (f.locked) return {} as any;
     const name = prompt("Название фигуры:", f.name ?? "Фигура")?.trim();
     if (!name) return {} as any;
     return { figures: st.figures.map(x=>x.id===id?{...x,name}:x) } as any;
@@ -122,6 +128,7 @@ export const useStore = create<Store>((set, get) => ({
     const id = st.selectedId; if(!id) return {} as any;
     const f = st.figures.find(x=>x.id===id);
     if (!f) return {} as any;
+    if (f.locked) return {} as any;
     const color = prompt("Цвет (hex или css):", f.color) ?? f.color;
     return { figures: st.figures.map(x=>x.id===id?{...x,color}:x) } as any;
   }),
@@ -164,6 +171,7 @@ export const useStore = create<Store>((set, get) => ({
     if (id && type) {
       get().setSelected(id, type);
       const item = getItemById(get(), id);
+      if ((item as any)?.locked) return; // нельзя перетаскивать/менять постоянную фигуру
       if (item && (type === "figure" || type === "line")) {
         const offsetX = Math.round((mx - (item as any).x)*10)/10;
         const offsetY = Math.round((my - (item as any).y)*10)/10;
@@ -206,7 +214,7 @@ export const useStore = create<Store>((set, get) => ({
       const isOverDelete = withinDeleteZone(ev.clientX, ev.clientY, rect);
       if (isOverDelete) {
         const t = getTypeById(st, dragId);
-        if (t === "figure") set((s)=>({ figures: s.figures.filter(f=>f.id!==dragId) }));
+        if (t === "figure") set((s)=>({ figures: s.figures.filter(f=>f.id!==dragId || (f.locked ?? false)) }));
         if (t === "line") set((s)=>({ lines: s.lines.filter(l=>l.id!==dragId) }));
         if (t === "group") set((s)=>({ groups: s.groups.filter(g=>g.id!==dragId) }));
       } else {
@@ -233,9 +241,26 @@ export const useStore = create<Store>((set, get) => ({
     .sort((a,b)=>a.z-b.z)
     .map((f)=> (
       <g key={f.id}>
-        <rect data-id={f.id} data-type="figure" x={metersToPx(f.x, scale)} y={metersToPx(f.y, scale)} width={metersToPx(f.w, scale)} height={metersToPx(f.h, scale)} fill={f.color} stroke="#111" strokeWidth={1} />
+        <rect 
+          {...(f.locked ? {} : { 'data-id': f.id, 'data-type': 'figure' })}
+          x={metersToPx(f.x, scale)} 
+          y={metersToPx(f.y, scale)} 
+          width={metersToPx(f.w, scale)} 
+          height={metersToPx(f.h, scale)} 
+          fill={f.color} 
+          stroke="#111" 
+          strokeWidth={1} 
+        />
         {f.name && (
-          <text data-id={f.id} data-type="figure" x={metersToPx(f.x + f.w/2, scale)} y={metersToPx(f.y + f.h/2, scale)} textAnchor="middle" dominantBaseline="middle" fontSize={12} fill="#d00">{f.name}</text>
+          <text 
+            {...(f.locked ? {} : { 'data-id': f.id, 'data-type': 'figure' })}
+            x={metersToPx(f.x + f.w/2, scale)} 
+            y={metersToPx(f.y + f.h/2, scale)} 
+            textAnchor="middle" 
+            dominantBaseline="middle" 
+            fontSize={12} 
+            fill="#d00"
+          >{f.name}</text>
         )}
       </g>
     )),

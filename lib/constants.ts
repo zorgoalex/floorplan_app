@@ -14,7 +14,7 @@ export const STROKES = {
 export const FIELD = {
   blockW: 6,      // ширина блока в метрах
   blockH: 16,     // высота блока в метрах
-  topRow: 5,      // верхний ряд: 5 блоков
+  topRow: 6,      // верхний ряд: 6 блоков
   bottomRow: 6,   // нижний ряд: 6 блоков
 };
 

@@ -11,6 +11,7 @@ export type Figure = {
   w: number; // meters
   h: number; // meters
   z: number; // layer order
+  locked?: boolean; // постоянная (нельзя выделять/перемещать/удалять)
 };
 
 export type Line = {

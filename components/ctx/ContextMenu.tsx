@@ -3,18 +3,19 @@ import React from "react";
 import { useStore } from "@/store";
 
 export function ContextMenu() {
-  const { ctx, actions } = useStore((s) => ({ ctx: s.ui.ctx, actions: s }));
+  const { ctx, actions, figures } = useStore((s) => ({ ctx: s.ui.ctx, actions: s, figures: s.figures }));
   if (!ctx.visible) return null;
+  const locked = ctx.target?.type === 'figure' && figures.find(f=>f.id===ctx.target!.id)?.locked;
   return (
     <div className="fixed z-20" style={{ left: ctx.x, top: ctx.y }} onMouseDown={(e)=>e.stopPropagation()}>
       <div className="rounded-xl bg-white shadow-lg border w-56 p-1">
         {ctx.target?.type === "group" ? (<><Item onClick={() => actions.ungroup(ctx.target!.id)}>Разгруппировать</Item><Hr /></>) : null}
-        <Item onClick={() => actions.renameSelected()}>Переименовать</Item>
-        {ctx.target?.type !== "group" && (<Item onClick={() => actions.pickColor()}>Изменить цвет</Item>)}
+        {!locked && (<Item onClick={() => actions.renameSelected()}>Переименовать</Item>)}
+        {!locked && ctx.target?.type !== "group" && (<Item onClick={() => actions.pickColor()}>Изменить цвет</Item>)}
         <Item onClick={() => actions.bringForward()}>Выше</Item>
         <Item onClick={() => actions.sendBackward()}>Ниже</Item>
-        {ctx.target?.type !== "group" && (<Item onClick={() => actions.duplicateSelected()}>Дублировать</Item>)}
-        <Item className="text-red-600" onClick={() => actions.deleteSelected()}>Удалить</Item>
+        {!locked && ctx.target?.type !== "group" && (<Item onClick={() => actions.duplicateSelected()}>Дублировать</Item>)}
+        {!locked && (<Item className="text-red-600" onClick={() => actions.deleteSelected()}>Удалить</Item>)}
       </div>
     </div>
   );

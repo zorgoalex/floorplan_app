@@ -6,7 +6,7 @@ import { useStore } from "@/store";
 export function DeleteZone() {
   const isOverDelete = useStore((s) => s.ui.isOverDelete);
   return (
-    <div style={{
+    <div id="delete-zone" style={{
       borderRadius: '12px',
       backgroundColor: 'white',
       boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
@@ -15,12 +15,13 @@ export function DeleteZone() {
       <div style={{
         borderRadius: '8px',
         border: `1px solid ${isOverDelete ? '#ef4444' : '#d1d5db'}`,
-        padding: '8px 6px',
+        padding: '16px 8px',
         textAlign: 'center',
         fontSize: '12px',
         backgroundColor: isOverDelete ? '#fef2f2' : 'transparent',
         color: isOverDelete ? '#dc2626' : '#374151',
-        transition: 'all 0.2s'
+        transition: 'all 0.2s',
+        minHeight: '150px' // увеличить визуально примерно в 3 раза
       }}>
         Зона удаления
       </div>
