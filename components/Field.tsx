@@ -23,7 +23,10 @@ export function Field() {
   const hPx = metersToPx(field.height, scale);
 
   return (
-    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
+    <div 
+      style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+      onContextMenu={(e)=>{ e.preventDefault(); }}
+    >
       <svg 
         ref={svgRef} 
         id="floorplan-svg" 

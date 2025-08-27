@@ -7,7 +7,11 @@ export function ContextMenu() {
   if (!ctx.visible) return null;
   const locked = ctx.target?.type === 'figure' && figures.find(f=>f.id===ctx.target!.id)?.locked;
   return (
-    <div style={{ position: 'fixed', zIndex: 1000, left: ctx.x, top: ctx.y }} onMouseDown={(e)=>e.stopPropagation()}>
+    <div 
+      style={{ position: 'fixed', zIndex: 1000, left: ctx.x, top: ctx.y }} 
+      onMouseDown={(e)=>e.stopPropagation()}
+      onContextMenu={(e)=>{ e.preventDefault(); e.stopPropagation(); }}
+    >
       <div
         className="rounded-xl bg-white shadow-lg border w-56 p-1"
         style={{
