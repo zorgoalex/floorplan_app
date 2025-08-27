@@ -20,6 +20,7 @@ export type Line = {
   x: number; // meters
   y: number; // meters
   length: number; // meters
+  angle?: 0 | 90; // orientation, degrees
   z: number;
 };
 

@@ -50,6 +50,9 @@ export function ContextMenu() {
             )}
           </>
         )}
+        {ctx.target?.type === "line" && (
+          <Item onClick={() => actions.rotateLine90(ctx.target!.id)}>Повернуть на 90°</Item>
+        )}
         <Item onClick={() => actions.bringForward()}>Выше</Item>
         <Item onClick={() => actions.sendBackward()}>Ниже</Item>
         {!locked && ctx.target?.type !== "group" && (<Item onClick={() => actions.duplicateSelected()}>Дублировать</Item>)}

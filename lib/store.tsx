@@ -30,6 +30,7 @@ export type Store = {
 
   addFigure: (opts:{width:number;height:number}) => void;
   addLine: (opts:{length:number}) => void;
+  rotateLine90: (id:ID) => void;
   updateFigure: (id:ID, patch: Partial<Figure>) => void;
   setSelected: (id:ID|null, type?: AnyItem["type"]) => void;
   deleteSelected: () => void;
@@ -74,7 +75,7 @@ export const useStore = create<Store>((set, get) => ({
   addLine: ({ length }) => set((st) => ({
     lines: [
       ...st.lines,
-      { id: nanoid(), type:"line", x: 1, y: 1, length, z: zTop(st) }
+      { id: nanoid(), type:"line", x: 1, y: 1, length, angle: 0, z: zTop(st) }
     ]
   })),
 
@@ -144,6 +145,28 @@ export const useStore = create<Store>((set, get) => ({
   }),
 
   ungroup: (gid) => set((st)=>({ groups: st.groups.filter(g=>g.id!==gid), selectedId: null })),
+
+  rotateLine90: (id) => set((st)=>{
+    const l = st.lines.find(x=>x.id===id);
+    if (!l) return {} as any;
+    const angle = (l.angle ?? 0) === 0 ? 90 : 0;
+    let nx = l.x, ny = l.y;
+    const len = l.length;
+    if ((l.angle ?? 0) === 0) {
+      // horizontal -> vertical around center
+      const cx = l.x + len/2;
+      const cy = l.y;
+      nx = Math.round(cx * 10) / 10;
+      ny = Math.round((cy - len/2) * 10) / 10;
+    } else {
+      // vertical -> horizontal around center
+      const cx = l.x;
+      const cy = l.y + len/2;
+      nx = Math.round((cx - len/2) * 10) / 10;
+      ny = Math.round(cy * 10) / 10;
+    }
+    return { lines: st.lines.map(x=>x.id===id?{...x, x:nx, y:ny, angle}:x) } as any;
+  }),
 
   handlePointerDown: (e) => {
     const target = e.target as HTMLElement;
@@ -288,7 +311,11 @@ export const useStore = create<Store>((set, get) => ({
     .sort((a,b)=>a.z-b.z)
     .map((l)=> (
       <g key={l.id}>
-        <line data-id={l.id} data-type="line" x1={metersToPx(l.x, scale)} y1={metersToPx(l.y, scale)} x2={metersToPx(l.x + l.length, scale)} y2={metersToPx(l.y, scale)} stroke="#111" strokeWidth={3} />
+        {((l.angle ?? 0) === 0) ? (
+          <line data-id={l.id} data-type="line" x1={metersToPx(l.x, scale)} y1={metersToPx(l.y, scale)} x2={metersToPx(l.x + l.length, scale)} y2={metersToPx(l.y, scale)} stroke="#111" strokeWidth={3} />
+        ) : (
+          <line data-id={l.id} data-type="line" x1={metersToPx(l.x, scale)} y1={metersToPx(l.y, scale)} x2={metersToPx(l.x, scale)} y2={metersToPx(l.y + l.length, scale)} stroke="#111" strokeWidth={3} />
+        )}
       </g>
     )),
 
