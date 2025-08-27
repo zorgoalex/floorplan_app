@@ -1,0 +1,22 @@
+# зависимости
+/node_modules
+
+# билд Next.js
+/.next
+/out
+
+# окружение
+.env.local
+.env.*.local
+
+# логи
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# редактор/IDE
+.DS_Store
+*.swp
+.idea/
+.vscode/

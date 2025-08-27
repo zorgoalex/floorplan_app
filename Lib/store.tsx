@@ -2,7 +2,7 @@
 import { create } from "zustand";
 import { nanoid } from "nanoid";
 import React from "react";
-import type { Figure, Line, Group, AnyItem, ID, PointerState, ContextMenuState } from "@/types";
+import type { Figure, Line, Group, AnyItem, ID, PointerState, ContextMenuState } from "./types";
 import { field as baseField, metersToPx, pxToMeters, useViewportScale, withinDeleteZone } from "@/lib/geometry";
 import { GRID } from "@/lib/constants";
 
@@ -299,4 +299,32 @@ function layerChange(st: Store, id: ID, dir: 1|-1) {
   if (type === "line") return { lines: st.lines.map(l=>l.id===id?{...l,z:l.z+dir}:l) } as any;
   if (type === "group") return { groups: st.groups.map(g=>g.id===id?{...g,z:g.z+dir}:g) } as any;
   return {} as any;
+}
+
+
+// Сгруппировать две фигуры: создаёт группу с толстым внешним контуром,
+// а у детей убирает названия и заливает белым (как в ТЗ).
+function doGroup(st: Store, idA: ID, idB: ID) {
+  const a = st.figures.find(f => f.id === idA);
+  const b = st.figures.find(f => f.id === idB);
+  if (!a || !b) return null;
+
+  const gid = nanoid();
+  const g: Group = {
+    id: gid,
+    type: "group",
+    children: [a.id, b.id],
+    z: Math.max(a.z, b.z) + 1,
+  };
+
+  // Удаляем name/цвет у детей группы, заливаем белым, как в спецификации
+  const updatedFigures = st.figures.map(f =>
+    g.children.includes(f.id) ? { ...f, name: undefined, color: "#ffffff" } : f
+  );
+
+  return {
+    groups: [...st.groups, g],
+    figures: updatedFigures,
+    selectedId: gid,
+  } as Partial<Store>;
 }
