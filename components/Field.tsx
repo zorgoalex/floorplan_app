@@ -44,18 +44,21 @@ export function Field() {
             ))}
           </g>
           <g>
-            {field.blocks.map((b) => (
-              <rect
-                key={b.id}
-                x={metersToPx(b.x, scale)}
-                y={metersToPx(b.y, scale)}
-                width={metersToPx(b.w, scale)}
-                height={metersToPx(b.h, scale)}
-                fill="none"
-                stroke="#d3d3d3"
-                strokeWidth={2}
-              />
-            ))}
+            {field.blocks.map((b) => {
+              const highlight = b.id === 'B5' || b.id === 'T4';
+              return (
+                <rect
+                  key={b.id}
+                  x={metersToPx(b.x, scale)}
+                  y={metersToPx(b.y, scale)}
+                  width={metersToPx(b.w, scale)}
+                  height={metersToPx(b.h, scale)}
+                  fill="none"
+                  stroke={highlight ? '#000' : '#d3d3d3'}
+                  strokeWidth={highlight ? STROKES.thick : 2}
+                />
+              );
+            })}
           </g>
           <g>
             {columns(scale).map((c) => (
