@@ -1,3 +1,5 @@
+// app/page.tsx
+
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { Header } from "@/components/Header";
@@ -50,12 +52,13 @@ export default function Page() {
   return (
     <div className="flex flex-col h-dvh">
       <Header currentUser={name ?? ""} onlineUsers={online} rightSlot={headerRight} />
-      <div className="flex flex-1 gap-4 p-4 max-w-[1600px] mx-auto w-full">
-        <div className="flex-1 relative rounded-2xl bg-white shadow-sm p-3 overflow-hidden">
+      {/* Изменения ниже: контейнер теперь relative, а Sidebar и DeleteZone позиционируются абсолютно */}
+      <div className="relative flex-1 p-4 max-w-[1600px] mx-auto w-full">
+        <div className="h-full rounded-2xl bg-white shadow-sm p-3 overflow-hidden">
           <Field />
-          <DeleteZone />
         </div>
         <Sidebar />
+        <DeleteZone />
       </div>
     </div>
   );

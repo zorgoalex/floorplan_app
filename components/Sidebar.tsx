@@ -1,3 +1,5 @@
+// components/Sidebar.tsx
+
 "use client";
 import React, { useState } from "react";
 import { useStore } from "@/store";
@@ -11,7 +13,8 @@ export function Sidebar() {
   const [len, setLen] = useState("4.0");
 
   return (
-    <aside className="w-[300px] shrink-0 rounded-2xl bg-white shadow-sm p-4 flex flex-col gap-6">
+    // Изменения в этой строке: добавлены классы absolute, top-4, right-4
+    <aside className="absolute top-4 right-4 w-[300px] rounded-2xl bg-white shadow-sm p-4 flex flex-col gap-6">
       <div>
         <h3 className="font-semibold mb-2">Создать фигуру</h3>
         <label className="block text-sm mb-1">Ширина (м, до 1 десятичного)</label>
