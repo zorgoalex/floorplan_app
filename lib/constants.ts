@@ -5,16 +5,17 @@ export const GRID = {
 };
 
 export const STROKES = {
-  thin: 1, // x1
-  thick: 5, // x5
-  line: 3, // x3
+  thin: 1, // x1 - контур отдельных фигур
+  thick: 5, // x5 - общий контур поля и групп
+  line: 3, // x3 - линии
 };
 
+// Новая структура поля по ТЗ: 11 прямоугольников 6×16 м
 export const FIELD = {
-  blockW: 6,
-  blockH: 16,
-  topRow: 6,
-  bottomRow: 5,
+  blockW: 6,      // ширина блока в метрах
+  blockH: 16,     // высота блока в метрах
+  topRow: 5,      // верхний ряд: 5 блоков
+  bottomRow: 6,   // нижний ряд: 6 блоков
 };
 
-export const COLUMN_DIAM = 0.2; // meters
+export const COLUMN_DIAM = 0.2; // диаметр столбов в метрах

@@ -3,7 +3,7 @@ import { create } from "zustand";
 import { nanoid } from "nanoid";
 import React from "react";
 import type { Figure, Line, Group, AnyItem, ID, PointerState, ContextMenuState } from "./types";
-import { field as baseField, metersToPx, pxToMeters, useViewportScale, withinDeleteZone } from "@/lib/geometry";
+import { field as baseField, gridLines as baseGridLines, columns as baseColumns, metersToPx, pxToMeters, useViewportScale, withinDeleteZone } from "@/lib/geometry";
 import { GRID } from "@/lib/constants";
 
 function snap(v: number, grid = GRID.step, eps = GRID.snapEps) {
@@ -50,8 +50,8 @@ const initialCtx: ContextMenuState = { visible:false, x:0, y:0, target:null };
 
 export const useStore = create<Store>((set, get) => ({
   field: baseField,
-  gridLines: (s)=>[],
-  columns: (s)=>[],
+  gridLines: baseGridLines,
+  columns: baseColumns,
 
   figures: [],
   lines: [],
@@ -232,10 +232,10 @@ export const useStore = create<Store>((set, get) => ({
   drawnFigures: (scale) => get().figures
     .sort((a,b)=>a.z-b.z)
     .map((f)=> (
-      <g key={f.id} data-id={f.id} data-type="figure">
-        <rect x={metersToPx(f.x, scale)} y={metersToPx(f.y, scale)} width={metersToPx(f.w, scale)} height={metersToPx(f.h, scale)} fill={f.color} stroke="#111" strokeWidth={1} />
+      <g key={f.id}>
+        <rect data-id={f.id} data-type="figure" x={metersToPx(f.x, scale)} y={metersToPx(f.y, scale)} width={metersToPx(f.w, scale)} height={metersToPx(f.h, scale)} fill={f.color} stroke="#111" strokeWidth={1} />
         {f.name && (
-          <text x={metersToPx(f.x + f.w/2, scale)} y={metersToPx(f.y + f.h/2, scale)} textAnchor="middle" dominantBaseline="middle" fontSize={12} fill="#d00">{f.name}</text>
+          <text data-id={f.id} data-type="figure" x={metersToPx(f.x + f.w/2, scale)} y={metersToPx(f.y + f.h/2, scale)} textAnchor="middle" dominantBaseline="middle" fontSize={12} fill="#d00">{f.name}</text>
         )}
       </g>
     )),
@@ -243,8 +243,8 @@ export const useStore = create<Store>((set, get) => ({
   drawnLines: (scale) => get().lines
     .sort((a,b)=>a.z-b.z)
     .map((l)=> (
-      <g key={l.id} data-id={l.id} data-type="line">
-        <line x1={metersToPx(l.x, scale)} y1={metersToPx(l.y, scale)} x2={metersToPx(l.x + l.length, scale)} y2={metersToPx(l.y, scale)} stroke="#111" strokeWidth={3} />
+      <g key={l.id}>
+        <line data-id={l.id} data-type="line" x1={metersToPx(l.x, scale)} y1={metersToPx(l.y, scale)} x2={metersToPx(l.x + l.length, scale)} y2={metersToPx(l.y, scale)} stroke="#111" strokeWidth={3} />
       </g>
     )),
 

@@ -20,3 +20,6 @@ pnpm-debug.log*
 *.swp
 .idea/
 .vscode/
+
+#CLAUDE
+.claude/

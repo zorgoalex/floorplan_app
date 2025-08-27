@@ -24,6 +24,14 @@ export default function Page() {
     } else setName(saved);
   }, []);
 
+  const resetName = () => {
+    sessionStorage.removeItem("fp_username");
+    const n = prompt("Введите новое имя:")?.trim();
+    const final = n && n.length ? n : `Гость-${Math.floor(Math.random() * 999)}`;
+    sessionStorage.setItem("fp_username", final);
+    setName(final);
+  };
+
   useEffect(() => {
     let stop = () => {};
     if (name) {
@@ -47,18 +55,79 @@ export default function Page() {
     return () => clearInterval(id);
   }, [kvReady, name]);
 
-  const headerRight = useMemo(() => (<div className="flex items-center gap-2"><ScreenshotButton /></div>), []);
+  const headerRight = useMemo(() => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <button 
+        onClick={resetName}
+        style={{
+          padding: '4px 8px',
+          fontSize: '12px',
+          borderRadius: '6px',
+          border: '1px solid #d1d5db',
+          backgroundColor: 'white',
+          cursor: 'pointer'
+        }}
+      >
+        Сменить имя
+      </button>
+      <ScreenshotButton />
+    </div>
+  ), [resetName]);
 
   return (
-    <div className="flex flex-col h-dvh">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       <Header currentUser={name ?? ""} onlineUsers={online} rightSlot={headerRight} />
-      {/* Изменения ниже: контейнер теперь relative, а Sidebar и DeleteZone позиционируются абсолютно */}
-      <div className="relative flex-1 p-4 max-w-[1600px] mx-auto w-full">
-        <div className="h-full rounded-2xl bg-white shadow-sm p-3 overflow-hidden">
-          <Field />
+      
+      {/* Основной контейнер */}
+      <div style={{ flex: 1, display: 'flex', padding: '16px', gap: '16px', minHeight: 0 }}>
+        
+        {/* Левая область - Поле плана и инфо (85% ширины) */}
+        <div style={{ 
+          flex: '0 0 85%',
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: '12px',
+          minHeight: 0
+        }}>
+          
+          {/* Имена пользователей над полем */}
+          <div style={{ 
+            padding: '8px 16px', 
+            fontSize: '14px', 
+            color: '#666',
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+          }}>
+            <span>Онлайн: {online.join(", ")}</span>
+          </div>
+          
+          {/* Поле плана (основная область) */}
+          <div style={{ 
+            position: 'relative', 
+            flex: 1,
+            minHeight: '70vh',
+            borderRadius: '16px', 
+            backgroundColor: 'white', 
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)', 
+            overflow: 'hidden'
+          }}>
+            <Field />
+          </div>
         </div>
-        <Sidebar />
-        <DeleteZone />
+        
+        {/* Правая колонка с панелями управления (15% ширины) */}
+        <div style={{ 
+          flex: '0 0 15%',
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: '12px',
+          maxWidth: '180px',
+          minWidth: '160px'
+        }}>
+          <Sidebar />
+          <DeleteZone />
+        </div>
       </div>
     </div>
   );

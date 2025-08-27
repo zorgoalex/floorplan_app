@@ -5,24 +5,44 @@ import React, { useState } from "react";
 import { useStore } from "@/store";
 import { metersNumber } from "@/lib/geometry";
 
-export function Sidebar() {
+// Компонент для создания фигур (компактный)
+export function FigureCreator() {
   const addFigure = useStore((s) => s.addFigure);
-  const addLine = useStore((s) => s.addLine);
   const [w, setW] = useState("3.0");
   const [h, setH] = useState("2.0");
-  const [len, setLen] = useState("4.0");
 
   return (
-    // Изменения в этой строке: добавлены классы absolute, top-4, right-4
-    <aside className="absolute top-4 right-4 w-[300px] rounded-2xl bg-white shadow-sm p-4 flex flex-col gap-6">
-      <div>
-        <h3 className="font-semibold mb-2">Создать фигуру</h3>
-        <label className="block text-sm mb-1">Ширина (м, до 1 десятичного)</label>
-        <input value={w} onChange={(e)=>setW(e.target.value)} className="input" placeholder="например, 2.5" />
-        <label className="block text-sm mt-3 mb-1">Высота (м, до 1 десятичного)</label>
-        <input value={h} onChange={(e)=>setH(e.target.value)} className="input" placeholder="например, 1.2" />
+    <div style={{
+      borderRadius: '12px',
+      backgroundColor: 'white',
+      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+      padding: '10px'
+    }}>
+      <h3 style={{ fontWeight: '600', marginBottom: '8px', fontSize: '13px' }}>Создать фигуру</h3>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        <div>
+          <label style={{ display: 'block', fontSize: '11px', marginBottom: '2px' }}>Ширина (м)</label>
+          <input 
+            value={w} 
+            onChange={(e)=>setW(e.target.value)} 
+            className="input" 
+            placeholder="2.5"
+            style={{ fontSize: '12px', padding: '4px 6px' }}
+          />
+        </div>
+        <div>
+          <label style={{ display: 'block', fontSize: '11px', marginBottom: '2px' }}>Высота (м)</label>
+          <input 
+            value={h} 
+            onChange={(e)=>setH(e.target.value)} 
+            className="input" 
+            placeholder="1.2"
+            style={{ fontSize: '12px', padding: '4px 6px' }}
+          />
+        </div>
         <button
-          className="btn mt-3"
+          className="btn"
+          style={{ width: '100%', fontSize: '12px', padding: '6px 8px' }}
           onClick={() => {
             const width = metersNumber(w, 0);
             const height = metersNumber(h, 0);
@@ -33,13 +53,37 @@ export function Sidebar() {
           }}
         >Создать фигуру</button>
       </div>
+    </div>
+  );
+}
 
-      <div>
-        <h3 className="font-semibold mb-2">Создать линию</h3>
-        <label className="block text-sm mb-1">Длина (м, до 1 десятичного)</label>
-        <input value={len} onChange={(e)=>setLen(e.target.value)} className="input" placeholder="например, 3.4" />
+// Компонент для создания линий (компактный)
+export function LineCreator() {
+  const addLine = useStore((s) => s.addLine);
+  const [len, setLen] = useState("4.0");
+
+  return (
+    <div style={{
+      borderRadius: '12px',
+      backgroundColor: 'white',
+      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+      padding: '10px'
+    }}>
+      <h3 style={{ fontWeight: '600', marginBottom: '8px', fontSize: '13px' }}>Создать линию</h3>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        <div>
+          <label style={{ display: 'block', fontSize: '11px', marginBottom: '2px' }}>Длина (м)</label>
+          <input 
+            value={len} 
+            onChange={(e)=>setLen(e.target.value)} 
+            className="input" 
+            placeholder="3.4"
+            style={{ fontSize: '12px', padding: '4px 6px' }}
+          />
+        </div>
         <button
-          className="btn mt-3"
+          className="btn"
+          style={{ width: '100%', fontSize: '12px', padding: '6px 8px' }}
           onClick={() => {
             const length = metersNumber(len, 0);
             if (length === null) return alert("Введите число с не более чем 1 десятичным знаком и > 0");
@@ -48,14 +92,38 @@ export function Sidebar() {
           }}
         >Создать линию</button>
       </div>
+    </div>
+  );
+}
 
-      <div className="text-xs text-neutral-600 leading-relaxed">
-        <p>• Перетаскивайте объекты; снаппинг к шагу 0.1 м и к краям.</p>
-        <p>• Стыковка формирует группу с общим толстым контуром.</p>
-        <p>• ПКМ — контекстное меню (дублирование, слои, удалить и т.д.).</p>
-        <p>• Зона удаления — внизу справа на поле.</p>
-        <p>• Скриншот — в шапке.</p>
+// Компонент с подсказками (компактный)
+export function HelpPanel() {
+  return (
+    <div style={{
+      borderRadius: '12px',
+      backgroundColor: 'white',
+      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+      padding: '10px'
+    }}>
+      <h3 style={{ fontWeight: '600', marginBottom: '8px', fontSize: '13px' }}>Справка</h3>
+      <div style={{ fontSize: '10px', color: '#666', lineHeight: '1.4' }}>
+        <p style={{ marginBottom: '3px' }}>• Перетаскивайте объекты</p>
+        <p style={{ marginBottom: '3px' }}>• Снаппинг к шагу 0.1 м</p>
+        <p style={{ marginBottom: '3px' }}>• Стыковка формирует группу</p>
+        <p style={{ marginBottom: '3px' }}>• ПКМ — контекстное меню</p>
+        <p>• Зона удаления справа снизу</p>
       </div>
-    </aside>
+    </div>
+  );
+}
+
+// Главный компонент Sidebar (объединяет все панели)
+export function Sidebar() {
+  return (
+    <>
+      <FigureCreator />
+      <LineCreator />
+      <HelpPanel />
+    </>
   );
 }
