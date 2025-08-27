@@ -41,6 +41,7 @@ export type Store = {
   ungroup: (id:ID) => void;
 
   handlePointerDown: (e: React.PointerEvent<SVGSVGElement>) => void;
+  handleContextMenu: (e: React.MouseEvent<SVGSVGElement>) => void;
   drawnFigures: (scale:number)=>React.ReactNode[];
   drawnLines: (scale:number)=>React.ReactNode[];
   drawnGroups: (scale:number)=>React.ReactNode[];
@@ -235,6 +236,24 @@ export const useStore = create<Store>((set, get) => ({
 
     window.addEventListener("pointermove", onMove);
     window.addEventListener("pointerup", onUp);
+  },
+
+  handleContextMenu: (e) => {
+    let el = e.target as HTMLElement | null;
+    let id: string | null = null;
+    let type: AnyItem["type"] | null = null;
+    while (el) {
+      id = el.getAttribute?.("data-id") ?? null;
+      type = (el.getAttribute?.("data-type") as AnyItem["type"]) ?? null;
+      if (id && type) break;
+      el = el.parentElement;
+    }
+    if (id && type) {
+      get().setSelected(id, type);
+      set((st)=>({ ui: { ...st.ui, ctx: { visible: true, x: e.clientX, y: e.clientY, target: { id, type } } } }));
+    } else {
+      set((st)=>({ ui: { ...st.ui, ctx: { visible: false, x: 0, y: 0, target: null } } }));
+    }
   },
 
   drawnFigures: (scale) => get().figures

@@ -8,11 +8,12 @@ import { ContextMenu } from "@/components/ctx/ContextMenu";
 export function Field() {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const scale = useViewportScale();
-  const { field, gridLines, columns, handlePointerDown, drawnFigures, drawnLines, drawnGroups } = useStore((s)=>({
+  const { field, gridLines, columns, handlePointerDown, handleContextMenu, drawnFigures, drawnLines, drawnGroups } = useStore((s)=>({
     field: s.field,
     gridLines: s.gridLines,
     columns: s.columns,
     handlePointerDown: s.handlePointerDown,
+    handleContextMenu: s.handleContextMenu,
     drawnFigures: s.drawnFigures,
     drawnLines: s.drawnLines,
     drawnGroups: s.drawnGroups,
@@ -27,7 +28,7 @@ export function Field() {
         ref={svgRef} 
         id="floorplan-svg" 
         style={{ width: '100%', height: '100%' }}
-        onContextMenu={(e)=>{ e.preventDefault(); (handlePointerDown as any)(e as any); }} 
+        onContextMenu={(e)=>{ e.preventDefault(); handleContextMenu(e); }} 
         onPointerDown={(e) => handlePointerDown(e)}
         viewBox={`0 0 ${wPx + 48} ${hPx + 48}`}
         preserveAspectRatio="xMidYMid meet"

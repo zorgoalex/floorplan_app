@@ -7,8 +7,18 @@ export function ContextMenu() {
   if (!ctx.visible) return null;
   const locked = ctx.target?.type === 'figure' && figures.find(f=>f.id===ctx.target!.id)?.locked;
   return (
-    <div className="fixed z-20" style={{ left: ctx.x, top: ctx.y }} onMouseDown={(e)=>e.stopPropagation()}>
-      <div className="rounded-xl bg-white shadow-lg border w-56 p-1">
+    <div style={{ position: 'fixed', zIndex: 1000, left: ctx.x, top: ctx.y }} onMouseDown={(e)=>e.stopPropagation()}>
+      <div
+        className="rounded-xl bg-white shadow-lg border w-56 p-1"
+        style={{
+          backgroundColor: 'white',
+          border: '1px solid #e5e7eb',
+          borderRadius: '12px',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+          padding: '6px',
+          minWidth: '220px'
+        }}
+      >
         {ctx.target?.type === "group" ? (<><Item onClick={() => actions.ungroup(ctx.target!.id)}>Разгруппировать</Item><Hr /></>) : null}
         {!locked && (<Item onClick={() => actions.renameSelected()}>Переименовать</Item>)}
         {!locked && ctx.target?.type !== "group" && (<Item onClick={() => actions.pickColor()}>Изменить цвет</Item>)}
